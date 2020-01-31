@@ -24,6 +24,9 @@
 #define RIGHT_F 9
 #define RIGHT_R 10
 
+#define ENA 7
+#define ENB 8
+
 // Sensors
 #define US_TRIG 11
 #define US_ECHO 12
@@ -40,11 +43,14 @@
 
 void setup()
 {
+    Serial.begin(9600);
+    Serial.println("Setting pins for motors");
     pinMode(LEFT_F, OUTPUT);
     pinMode(LEFT_R, OUTPUT);
     pinMode(RIGHT_R, OUTPUT);
     pinMode(RIGHT_R, OUTPUT);
 
+    Serial.println("Setting pins for sensors");
     pinMode(US_TRIG, OUTPUT);
     pinMode(US_ECHO, INPUT);
     pinMode(IR, INPUT);
@@ -55,16 +61,19 @@ void loop()
     // First make sure we're not getting pushed out
     if (get_colour() == BLACK)
     {
+        Serial.println("Found the edge, going forward");
         forward(MAX_SPEED);
         return;
     }
 
     // Rotate until target is found
     if (get_distance() > DETECTION_DISTANCE) {
+        Serial.println("Haven't found a target, spinning");
         c_rotate(MAX_SPEED);
     }
     else
     {
+        Serial.println("Found a target, going forward");
         forward(MAX_SPEED);
     }
 }
@@ -80,6 +89,8 @@ void loop()
  */
 void forward(int speed)
 {
+    analogWrite(ENA, speed);
+    analogWrite(ENB, speed);
     analogWrite(RIGHT_F, speed);
     analogWrite(RIGHT_R, 0);
     analogWrite(LEFT_F, speed);
@@ -93,6 +104,8 @@ void forward(int speed)
  */
 void reverse(int speed)
 {
+    analogWrite(ENA, speed);
+    analogWrite(ENB, speed);
     analogWrite(RIGHT_F, 0);
     analogWrite(RIGHT_R, speed);
     analogWrite(LEFT_F, 0);
@@ -106,6 +119,8 @@ void reverse(int speed)
  */
 void c_rotate(int speed)
 {
+    analogWrite(ENA, speed);
+    analogWrite(ENB, speed);
     analogWrite(RIGHT_F, 0);
     analogWrite(LEFT_F, speed);
     analogWrite(RIGHT_R, speed);
@@ -120,6 +135,8 @@ void c_rotate(int speed)
  */
 void cc_rotate(int speed)
 {
+    analogWrite(ENA, speed);
+    analogWrite(ENB, speed);
     analogWrite(RIGHT_F, speed);
     analogWrite(LEFT_F, 0);
     analogWrite(RIGHT_R, 0);
@@ -150,7 +167,7 @@ int get_distance()
  */
 int get_colour()
 {
-    if (analogRead(IR) < 650))
+    if (analogRead(IR) < 650)
         return WHITE;
     return BLACK;
 }
